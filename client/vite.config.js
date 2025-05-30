@@ -1,11 +1,13 @@
-import { defineConfig } from 'vite';
-import tailwindcss from '@tailwindcss/vite';
+// tailwind.config.cjs
 
-export default defineConfig({
-  plugins: [
-    tailwindcss()
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
   ],
-   build: {
-    outDir: 'dist', // default output directory
+  theme: {
+    extend: {},
   },
-});
+  plugins: [require("daisyui")],
+};
