@@ -9,7 +9,6 @@ const generateToken = (userId, res) => {
     maxAge: 15 * 24 * 60 * 1000, // 15 days
     httpOnly: true,
     sameSite: "strict",
-    secure: process.env.NODE_ENV === "production", // Set to true for production over HTTPS
   });
 };
 
