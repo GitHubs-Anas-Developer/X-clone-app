@@ -80,7 +80,7 @@ const CreatePost = () => {
       </div>
       <form className="flex flex-col gap-2 w-full" onSubmit={handleSubmit}>
         <textarea
-          className="textarea w-full p-0 text-lg resize-none border-none focus:outline-none  border-gray-800"
+          className="textarea w-full p-0 text-lg resize-none focus:outline-none  border-gray-800"
           placeholder="What is happening?!"
           value={text}
           onChange={(e) => setText(e.target.value)}
@@ -90,7 +90,7 @@ const CreatePost = () => {
             <IoCloseSharp
               className="absolute top-0 right-0 text-white bg-gray-800 rounded-full w-5 h-5 cursor-pointer"
               onClick={() => {
-                setImg(null);
+                setImg(null); border-none
                 imgRef.current.value = null;
               }}
             />
@@ -101,7 +101,7 @@ const CreatePost = () => {
           </div>
         )}
 
-        <div className="flex justify-between border-t py-2 border-t-gray-700">
+        <div className="flex justify-between border-t py-2  border-none">
           <div className="flex gap-1 items-center">
             <CiImageOn
               className="fill-primary w-6 h-6 cursor-pointer"

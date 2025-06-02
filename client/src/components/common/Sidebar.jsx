@@ -11,55 +11,46 @@ import XSvg from './../svgs/X';
 
 const Sidebar = () => {
   const queryClient = useQueryClient();
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
+  // ✅ Get authenticated user data
+  const { data: authUser } = useQuery({
+    queryKey: ["authUser"],
+    staleTime: 5 * 60 * 1000,
+  });
 
+  // ✅ Logout Mutation
   const { mutate: logout } = useMutation({
     mutationFn: async () => {
-      try {
-        const res = await fetch(`${baseUrl}/api/auth/logout`, {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
-        const data = await res.json();
-
-        
-
-        if (!res.ok) {
-          throw new Error(data.message || "Something went wrong");
-        }
-      } catch (error) {
-        throw new Error(error);
+      const res = await fetch(`${baseUrl}/api/auth/logout`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.message || "Something went wrong");
       }
     },
-
     onSuccess: () => {
       toast.success("👋 Successfully logged out. Take care!");
-                  navigate("/login"); // redirect after logout
-
-    
       queryClient.invalidateQueries({ queryKey: ["authUser"] });
-
+      navigate("/signup");
     },
-    onError: (error) => {
-      toast.error(" ⚠️ Oops! Something went wrong. Unable to log out.");
+    onError: () => {
+      toast.error("⚠️ Oops! Something went wrong. Unable to log out.");
     },
   });
 
-
-  const { data: authUser } = useQuery({ queryKey: ["authUser"] });
-
-
   return (
     <div className="md:flex-[2_2_0] w-18 max-w-52">
-      <div className="sticky top-0 left-0 h-screen flex flex-col border-r border-gray-700 w-20 md:w-full">
+      <div className="sticky top-0 left-0 h-screen flex flex-col border-r border-gray-700 md:w-full">
         <Link to="/" className="flex justify-center md:justify-start">
           <XSvg className="px-2 w-12 h-12 rounded-full fill-white hover:bg-stone-900" />
         </Link>
+
         <ul className="flex flex-col gap-3 mt-4">
           <li className="flex justify-center md:justify-start">
             <Link
@@ -70,6 +61,7 @@ const Sidebar = () => {
               <span className="text-lg hidden md:block">Home</span>
             </Link>
           </li>
+
           <li className="flex justify-center md:justify-start">
             <Link
               to="/notifications"
@@ -80,42 +72,52 @@ const Sidebar = () => {
             </Link>
           </li>
 
-          <li className="flex justify-center md:justify-start">
-            <Link
-              to={`/profile/${authUser.user?.userName}`}
-              className="flex gap-3 items-center hover:bg-stone-900 transition-all rounded-full duration-300 py-2 pl-2 pr-4 max-w-fit cursor-pointer"
-            >
-              <FaUser className="w-6 h-6" />
-              <span className="text-lg hidden md:block">Profile</span>
-            </Link>
-          </li>
+          {authUser?.user && (
+            <li className="flex justify-center md:justify-start">
+              <Link
+                to={`/profile/${authUser.user.userName}`}
+                className="flex gap-3 items-center hover:bg-stone-900 transition-all rounded-full duration-300 py-2 pl-2 pr-4 max-w-fit cursor-pointer"
+              >
+                <FaUser className="w-6 h-6" />
+                <span className="text-lg hidden md:block">Profile</span>
+              </Link>
+            </li>
+          )}
         </ul>
 
-        <Link
-          to={`/profile/:userName`}
-          className="mt-auto mb-10 flex gap-2 items-start transition-all duration-300 hover:bg-[#181818] py-2 px-4 rounded-full"
-        >
-          <div className="avatar hidden md:inline-flex">
-            <div className="w-8 rounded-full">
-              <img src={`${authUser.user?.profileImage}` ||"./avatar-placeholder.png"} />
+        {/* ✅ Bottom profile info and logout */}
+        {authUser?.user && (
+          <div
+            className="mt-auto mb-10 flex gap-2 items-start transition-all duration-300 hover:bg-[#181818] py-2 px-4 rounded-full cursor-pointer"
+            onClick={(e) => {
+              e.preventDefault();
+              logout();
+            }}
+          >
+            <div className="avatar hidden md:inline-flex">
+              <div className="w-8 rounded-full">
+                <img
+                  src={authUser.user.profileImage || "/avatar-placeholder.png"}
+                  alt="User Avatar"
+                />
+              </div>
+            </div>
+            <div className="flex justify-between flex-1">
+              <div className="hidden md:block">
+                <p className="text-white font-bold text-sm w-20 truncate">
+                  {authUser.user.fullName || "User"}
+                </p>
+                <p className="text-slate-500 text-sm">
+                  @{authUser.user.userName || "username"}
+                </p>
+              </div>
+              <BiLogOut className="w-5 h-5" />
             </div>
           </div>
-          <div className="flex justify-between flex-1">
-            <div className="hidden md:block">
-              <p className="text-white font-bold text-sm w-20 truncate">{authUser?.user.fullName}</p>
-              <p className="text-slate-500 text-sm">@{authUser?.user.userName}</p>
-            </div>
-            <BiLogOut
-              className="w-5 h-5 cursor-pointer"
-              onClick={(e) => {
-                e.preventDefault();
-                logout();
-              }}
-            />
-          </div>
-        </Link>
+        )}
       </div>
     </div>
   );
 };
+
 export default Sidebar;

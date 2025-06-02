@@ -84,9 +84,10 @@ const Post = ({ post }) => {
       });
     },
     onError: (error) => {
-      toast.error(error.message);
     },
   });
+
+  
 
   const { mutate: commentPost, isPending: isCommenting } = useMutation({
     mutationFn: async () => {
